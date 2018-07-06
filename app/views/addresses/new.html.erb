@@ -1,25 +1,19 @@
-<%= form_tag '/addresses', method: :post do %>
-    <div>
-      <%= label_tag :street_address %>
-      <%= text_field_tag :street_address%>
-    </div>
-
-    <div>
-      <%= label_tag :city %>
-      <%= text_field_tag :city%>
-    </div>
-
-    <div>
-      <%= label_tag :state %>
-      <%= text_field_tag :state%>
-    </div>
-
-    <div>
-      <%= label_tag :zip_code %>
-      <%= text_field_tag :zip_code%>
-    </div>
-
-    <div class = "buttons">
-      <%= submit_tag 'Validate Address' %>
-    </div>
+<%= bootstrap_form_for(@address) do |f| %>
+  <%= f.text_field :street_name %>
+  <%= f.text_field :city %>
+  <%= f.text_field :state %>
+  <%= f.text_field :zip_5, required: true %>
+  <%= f.submit "Validate Address" %>
 <% end %>
+<script>
+function validatearticleFunction() {
+  $(“#new_address”).validate({
+    debug: false,
+    rules: {
+      “article[zip_code]”: { minlength: 5, maxlength: 5  }
+           }
+        })
+      }
+$(document).ready(validatearticleFunction);
+$(document).on(‘page:load’, validatearticleFunction);
+</script>
