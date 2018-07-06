@@ -5,6 +5,7 @@ class AddressesController < ApplicationController
   end
 
   def new
+    @address = Address.new
   end
 
   def create

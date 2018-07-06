@@ -6,14 +6,14 @@
   <%= f.submit "Validate Address" %>
 <% end %>
 <script>
-function validatearticleFunction() {
-  $(“#new_address”).validate({
+function validateAddressFunction() {
+  $("#new_address").validate({
     debug: false,
     rules: {
-      “article[zip_code]”: { minlength: 5, maxlength: 5  }
+      "address[zip_5]": { minlength: 5, maxlength: 5  }
            }
         })
       }
-$(document).ready(validatearticleFunction);
-$(document).on(‘page:load’, validatearticleFunction);
+$(document).ready(validateAddressFunction);
+$(document).on('page:load', validateAddressFunction);
 </script>
