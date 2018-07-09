@@ -30,6 +30,16 @@ RSpec.describe Address, :type => :model do
       end
     end
 
+    context 'Given zip plus four' do
+      let(:address) { create(:address_zip_four)}
+      it 'can parse first 5 digits' do
+        expect(address.get_zip_5).to eq('10024')
+      end
+      it 'can parse extra 4 digits' do
+        expect(address.get_zip_4).to eq('2313')
+      end
+    end
+
     describe '#to_s' do
       let(:address) { create(:address_ny) }
       it 'prints out the address components needed for mailing together as a string' do

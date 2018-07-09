@@ -1,19 +1,62 @@
 <%= bootstrap_form_for(@address) do |f| %>
-  <%= f.text_field :street_name %>
-  <%= f.text_field :city %>
-  <%= f.text_field :state %>
-  <%= f.text_field :zip_5, required: true %>
+  <%= f.text_field :street_address, required: true %>
+  <%= f.text_field :city, required: true %>
+  <%= f.select :state, STATES, required: true %>
+  <%= f.text_field :zip_code, required: true %>
   <%= f.submit "Validate Address" %>
 <% end %>
 <script>
+jQuery.validator.addMethod("startsWithStreetNumber", function(value, element, param)
+{
+  if(this.optional(element))
+  {
+    return true;
+  }
+  if(/^\d+/.test(value))
+  {
+    return true;
+  }
+  return false;
+}, "Please include the address number.");
+
+jQuery.validator.addMethod("isValidZipCode", function(value, element, param)
+{
+  if(this.optional(element))
+  {
+    return true;
+  }
+  if(/^\d{5}(\-?\d{4})?$/.test(value))
+  {
+    return true;
+  }
+  return false;
+}, "Please include a valid zip code.");
+
+// jQuery.validator.addMethod("includesStreetDesignator", function(value, element, param)
+// {
+//   if(this.optional(element))
+//   {
+//     return true;
+//   }
+//   if(//.test(value))
+//   {
+//     return true;
+//   }
+//   return false;
+// }, "Please include the address number.");
+
 function validateAddressFunction() {
-  $("#new_address").validate({
-    debug: false,
-    rules: {
-      "address[zip_5]": { minlength: 5, maxlength: 5  }
-           }
-        })
-      }
+
+    $("#new_address").validate(
+      {
+        debug: false,
+        rules:
+          {
+            "address[zip_code]": { isValidZipCode: true },
+            "address[street_address]": { startsWithStreetNumber: true }
+          }
+        });
+    }
 $(document).ready(validateAddressFunction);
 $(document).on('page:load', validateAddressFunction);
 </script>
