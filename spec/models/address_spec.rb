@@ -40,6 +40,17 @@ RSpec.describe Address, :type => :model do
       end
     end
 
+    context 'Given simple address' do
+      let (:address) { create(:address_ny)}
+      it 'can find the house number' do
+        expect(address.get_house_number).to eq('129')
+      end
+
+      it 'can find the street name' do
+        expect(address.get_street_name).to eq('81st')
+      end
+    end
+
     describe '#to_s' do
       let(:address) { create(:address_ny) }
       it 'prints out the address components needed for mailing together as a string' do
