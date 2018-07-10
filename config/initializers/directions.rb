@@ -1,8 +1,1 @@
-# DIRECTIONS = [
-#   "E", "EAST",
-#   "N", "NORTH", "NE", "NORTH EAST", "NORTHEAST", "NW", "NORTH WEST", "NORTHWEST",
-#   "S", "SOUTH", "SE", "SOUTH EAST", "SOUTHEAST", "SW", "SOUTH WEST", "SOUTHWEST",
-#   "W", "WEST"
-# ]
-
 DIRECTIONS = ["E", "EAST", "N","NORTH","S","SOUTH","W","WEST"]

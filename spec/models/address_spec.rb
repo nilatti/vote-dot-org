@@ -33,21 +33,21 @@ RSpec.describe Address, :type => :model do
     context 'Given zip plus four' do
       let(:address) { create(:address_zip_four)}
       it 'can parse first 5 digits' do
-        expect(address.get_zip_5).to eq('10024')
+        expect(address.zip_5).to eq('10024')
       end
       it 'can parse extra 4 digits' do
-        expect(address.get_zip_4).to eq('2313')
+        expect(address.zip_4).to eq('2313')
       end
     end
 
     context 'Given simple address' do
       let (:address) { create(:address_ny)}
       it 'can find the house number' do
-        expect(address.get_house_number).to eq('129')
+        expect(address.house_number).to eq('129')
       end
 
       it 'can find the street name' do
-        expect(address.get_street_name).to eq('81st')
+        expect(address.street_name).to eq('81st')
       end
     end
 
