@@ -56,10 +56,21 @@ RSpec.describe Address, :type => :model do
 
     context 'given no directionals' do
       let (:address) { create(:address_simple)}
-      it 'parses out the house number, street name, and type' do
+      it 'parses out the house number' do
         expect(address.house_number).to eq('2303')
+      end
+      it 'parses out the street name' do
         expect(address.street_name).to eq('Shoreshill')
+      end
+      it 'parses out the street type' do
         expect(address.street_type).to eq('Rd')
+      end
+    end
+
+    context 'given address with spaces and apostrophes in the street name' do
+      let(:address) { create(:address_spaces)}
+      it 'finds the correct street name' do
+        expect(address.street_name).to eq("St. Ann's")
       end
     end
 
@@ -67,6 +78,17 @@ RSpec.describe Address, :type => :model do
       let (:address) { create(:address_lobby)}
       it 'finds the correct unit type' do
         expect(address.unit_type).to eq('Lobby')
+      end
+    end
+
+    context 'given address with unit that requires number' do
+      let (:address) { create(:address_apartment)}
+      let (:invalid_address) { create(:address_apartment_invalid)}
+      it 'finds the correct unit type' do
+        expect(address.unit_type).to eq('Apt')
+      end
+      it 'declares address invalid if it lacks required number' do
+        expect(invalid_address).not_to be_valid
       end
     end
 
@@ -80,7 +102,8 @@ RSpec.describe Address, :type => :model do
         expect(address.street_postdirection).to eq('North')
       end
       it 'can ignore opposing directions' do
-        expect(confusing_address.street_postdirection).to eq('North')
+        expect(confusing_address.street_predirection).to eq('North')
+        expect(confusing_address.street_name).to eq('South')
       end
 
     end

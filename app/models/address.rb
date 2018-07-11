@@ -15,43 +15,23 @@ class Address < ApplicationRecord
       parse_zip_code
     end
   end
+
   def group_directions(a, b)
-    puts "grouping directions"
-    puts self.street_address
-    if a.match(/east/i) && b.match(/west/i)
-      puts "opposing directions"
-      self.street_name = b + " " + self.street_name
-      return a
-    else
-      return a + " " + b
-    end
+    return a + " " + b
   end
 
   def parse_street_address # I did have some code that upcased the whole address and removed extraneous spaces bc this is what USPS says they prefer, but the upcasing was making a test fail.
     street_types = STREET_TYPES.join("|")
     directions = DIRECTIONS.join("|")
     units_not_requiring_numbers = UNITS_NOT_REQUIRING_NUMBERS.join("|")
-
-    self.street_address.match(/^(\d+)\s*(#{directions})*\s*(#{directions})*\s([a-zA-Z0-9\.\']*)\s(#{street_types})\s*(#{directions})*\s*(#{directions})*$/i)
-    self.house_number = $1
-    self.street_name = $4
-    if $2 && $3
-      self.street_predirection = group_directions($2, $3)
-    else
-      self.street_predirection = $2
+    set_house_number
+    set_street_name_and_street_type
+    set_predirection
+    set_postdirection
+    set_unit_type
+    if self.unit_type
+      set_unit_number
     end
-
-    self.street_type = $5
-
-    if $6 && $7
-      self.street_postdirection = group_directions($6, $7)
-    else
-      self.street_postdirection = $6
-    end
-    self.unit_type = $8
-    # self.unit_number = get_unit_number
-    # self.unit_type = get_unit_type
-    # self.county = get_county
   end
 
   def parse_zip_code
@@ -60,14 +40,61 @@ class Address < ApplicationRecord
     self.zip_4 = $3
   end
 
-  # def regularize_text
-  #   self.street_address.upcase!.gsub!(/\s{2,}/,' ')
-  # end
+  def set_house_number
+    street_address.match(/^(\d+)\s/)
+    self.house_number = $1
+  end
+
+  def set_predirection #some confusing stuff here. Need to account for addresses like "1079 North Road"
+    directions = DIRECTIONS.join("|")
+
+    if street_address.match(/(#{directions})\s(#{directions})\s#{self.street_type}/i)
+      self.street_predirection = $1
+      self.street_name = $2
+    elsif street_address.match(/#{self.house_number}\s(#{directions})\s#{self.street_type}/i)
+      self.street_name = $1
+    elsif  street_name.match(/^(#{directions})*\s*(#{directions})*\s/i)
+      if $1 && $2
+        self.street_predirection = group_directions($1, $2)
+      else
+        self.street_predirection = $1
+      end
+    end
+  end
+
+  def set_postdirection
+    directions = DIRECTIONS.join("|")
+    street_address.match(/#{self.street_type}\s*(#{directions})*\s*(#{directions})*/i)
+    if $1 && $2
+      self.street_postdirection = group_directions($1, $2)
+    else
+      self.street_postdirection = $1
+    end
+  end
+
+  def set_street_name_and_street_type
+    street_types = STREET_TYPES.join("|")
+    directions = DIRECTIONS.join("|")
+    street_address.match(/\s([a-zA-Z0-9\.\'\s]*)\s(#{street_types})/i)
+    self.street_name = $1
+    self.street_type = $2
+  end
+
+  def set_unit_number
+    street_address.match(/#{self.street_name}\s#{self.street_type}\s#{self.street_postdirection}\s*#{self.unit_type}\s*([a-zA-Z0-9\.]*)/i)
+    self.unit_number = $1
+  end
+
+  def set_unit_type
+    unit_types = UNITS_NOT_REQUIRING_NUMBERS.concat(UNITS_REQUIRING_NUMBERS)
+    unit_types_string = unit_types.join("|")
+    street_address.match(/#{self.street_name}\s#{self.street_type}\s#{self.street_postdirection}\s*(#{unit_types_string})*/i)
+    self.unit_type = $1
+  end
 
   def to_s
-    # TODO: override the to_s method so that it prints out the address components as follows
-    # house_number street_name street_predirection street_type street_postdirection unit_type unit_number, city, state, zip_5
-    return "#{self.house_number} #{self.street_name} #{self.street_predirection} #{self.street_type} #{self.street_postdirection} #{self.unit_type} #{self.unit_number}, #{self.city}, #{self.state}, #{self.zip_5}"
+    string = "#{self.house_number} #{self.street_predirection} #{self.street_name} #{self.street_type} #{self.street_postdirection} #{self.unit_type} #{self.unit_number}, #{self.city}, #{self.state} #{self.zip_5}"
+    string.gsub!(/\s{2,}/," ")
   end
 
 end
