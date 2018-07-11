@@ -1,62 +1,27 @@
-<%= bootstrap_form_for(@address) do |f| %>
-  <%= f.text_field :street_address, required: true %>
-  <%= f.text_field :city, required: true %>
-  <%= f.select :state, STATES, required: true %>
-  <%= f.text_field :zip_code, required: true %>
-  <%= f.submit "Validate Address" %>
-<% end %>
-<script>
-jQuery.validator.addMethod("startsWithStreetNumber", function(value, element, param)
-{
-  if(this.optional(element))
-  {
-    return true;
-  }
-  if(/^\d+/.test(value))
-  {
-    return true;
-  }
-  return false;
-}, "Please include the address number.");
-
-jQuery.validator.addMethod("isValidZipCode", function(value, element, param)
-{
-  if(this.optional(element))
-  {
-    return true;
-  }
-  if(/^\d{5}(\-?\d{4})?$/.test(value))
-  {
-    return true;
-  }
-  return false;
-}, "Please include a valid zip code.");
-
-// jQuery.validator.addMethod("includesStreetDesignator", function(value, element, param)
-// {
-//   if(this.optional(element))
-//   {
-//     return true;
-//   }
-//   if(//.test(value))
-//   {
-//     return true;
-//   }
-//   return false;
-// }, "Please include the address number.");
-
-function validateAddressFunction() {
-
-    $("#new_address").validate(
-      {
-        debug: false,
-        rules:
-          {
-            "address[zip_code]": { isValidZipCode: true },
-            "address[street_address]": { startsWithStreetNumber: true }
-          }
-        });
-    }
-$(document).ready(validateAddressFunction);
-$(document).on('page:load', validateAddressFunction);
-</script>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12"  id="header">
+      <h1>
+        Address Validator
+      </h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 offset-3" id="form">
+      <%= bootstrap_form_for(@address) do |f| %>
+      <% if @address.errors.any? %>
+        <% @address.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      <% end %>
+        <%= f.text_field :street_address, required: true %>
+        <div class="input-group">
+          <%= f.text_field :city, required: true %>
+          <%= f.select :state, STATES, required: true %>
+          <%= f.text_field :zip_code, required: true %>
+        </div>
+        <%= f.submit "Validate Address" %>
+      <% end %>
+    </div>
+  </div>
+</div>

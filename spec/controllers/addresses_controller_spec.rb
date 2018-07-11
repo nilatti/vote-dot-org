@@ -5,10 +5,12 @@ RSpec.describe AddressesController, :type => :controller do
     context 'with valid params' do
       let(:valid_params) {
         {
-          street_address: '1600 Pennsylvania Avenue NW',
-          city: 'Washington',
-          state: 'DC',
-          zip_code: '20500'
+          address: {
+            street_address: '1600 Pennsylvania Avenue NW',
+            city: 'Washington',
+            state: 'DC',
+            zip_code: '20500'
+          }
         }
       }
       before do

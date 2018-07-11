@@ -3,3 +3,21 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 @import "bootstrap";
+.input-group > .form-group:first-child {
+  padding-right: 10px;
+}
+
+.input-group > .form-group:not(:first-child) {
+  padding-left: 10px;
+}
+
+#form {
+  padding-top: 20px;
+}
+
+#header {
+  color: white;
+  background-color: #4286f4;
+  text-align: center;
+  padding: 25px 0 25px 0;
+}

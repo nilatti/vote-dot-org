@@ -11,13 +11,12 @@ class AddressesController < ApplicationController
   def create
     @address = Address.new(address_params)
     @address.save
-
     render 'new'
   end
 
   private
 
   def address_params
-    params.permit(:city, :state, :street_address, :zip_code)
+    params.require(:address).permit(:city, :state, :street_address, :zip_code)
   end
 end

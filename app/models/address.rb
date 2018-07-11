@@ -1,13 +1,18 @@
 class Address < ApplicationRecord
   attr_accessor(:zip_code, :street_address)
 
-  before_validation :check_zip_code, :check_street_address, :to_s
+  before_validation :check_zip_code, :to_s
+  before_validation :check_street_address, if: :street_address
 
   validates :zip_5, presence: true, length: { is: 5 }
+  validate :unit_has_number, if: :unit_type
 
   def check_street_address
-    if self.street_address
+    street_types = STREET_TYPES.join("|")
+    if self.street_address.match(/#{street_types}/i)
       parse_street_address
+    else
+      errors.add(:street_address, "You have to say what kind of street it is")
     end
   end
   def check_zip_code
@@ -53,7 +58,7 @@ class Address < ApplicationRecord
       self.street_name = $2
     elsif street_address.match(/#{self.house_number}\s(#{directions})\s#{self.street_type}/i)
       self.street_name = $1
-    elsif  street_name.match(/^(#{directions})*\s*(#{directions})*\s/i)
+    elsif  self.street_name.match(/^(#{directions})*\s*(#{directions})*\s/i)
       if $1 && $2
         self.street_predirection = group_directions($1, $2)
       else
@@ -95,6 +100,12 @@ class Address < ApplicationRecord
   def to_s
     string = "#{self.house_number} #{self.street_predirection} #{self.street_name} #{self.street_type} #{self.street_postdirection} #{self.unit_type} #{self.unit_number}, #{self.city}, #{self.state} #{self.zip_5}"
     string.gsub!(/\s{2,}/," ")
+  end
+
+  def unit_has_number
+    if UNITS_REQUIRING_NUMBERS.include?(self.unit_type.upcase) && self.unit_number.blank?
+        errors.add(:unit_number, "This type of unit requires a number")
+    end
   end
 
 end

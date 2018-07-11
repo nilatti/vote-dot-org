@@ -83,11 +83,12 @@ RSpec.describe Address, :type => :model do
 
     context 'given address with unit that requires number' do
       let (:address) { create(:address_apartment)}
-      let (:invalid_address) { create(:address_apartment_invalid)}
+
       it 'finds the correct unit type' do
         expect(address.unit_type).to eq('Apt')
       end
       it 'declares address invalid if it lacks required number' do
+        invalid_address = build(:address_apartment_invalid)
         expect(invalid_address).not_to be_valid
       end
     end
