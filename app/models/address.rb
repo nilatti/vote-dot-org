@@ -17,42 +17,38 @@ class Address < ApplicationRecord
   end
   def group_directions(a, b)
     puts "grouping directions"
-    unless (a == 'NORTH' && b == 'SOUTH') || (a == 'SOUTH' && b == 'NORTH') || (a == 'EAST' && b == 'WEST') || (a == 'WEST' && b == 'EAST')
+    puts self.street_address
+    if a.match(/east/i) && b.match(/west/i)
+      puts "opposing directions"
+      self.street_name = b + " " + self.street_name
+      return a
+    else
       return a + " " + b
     end
   end
 
-  def parse_street_address
-    puts "parsing street address"
-    puts self.street_address
+  def parse_street_address # I did have some code that upcased the whole address and removed extraneous spaces bc this is what USPS says they prefer, but the upcasing was making a test fail.
     street_types = STREET_TYPES.join("|")
     directions = DIRECTIONS.join("|")
+    units_not_requiring_numbers = UNITS_NOT_REQUIRING_NUMBERS.join("|")
 
-    # self.street_address.match(/^(\d+)\s(#{directions})*\s*(#{directions})*\s*([a-zA-Z0-9\s\.\']+)\s(#{street_types})\s(#{directions})*\s(#{directions})*$/)
-    self.street_address.match(/^(\d+)\s(#{directions})*\s*(#{directions})*\s*([a-zA-Z0-9\s\.\']+)\s(#{street_types})\s(#{directions})*\s*(#{directions})*$/i)
+    self.street_address.match(/^(\d+)\s*(#{directions})*\s*(#{directions})*\s([a-zA-Z0-9\.\']*)\s(#{street_types})\s*(#{directions})*\s*(#{directions})*$/i)
     self.house_number = $1
-    puts "house number"
-    puts self.house_number
-    puts "predirections"
-    puts $2
-    puts $3
-    puts "street name"
-    puts $4
+    self.street_name = $4
     if $2 && $3
       self.street_predirection = group_directions($2, $3)
     else
       self.street_predirection = $2
     end
-    puts "predirection"
-    puts self.street_predirection
-    self.street_name = $4
+
     self.street_type = $5
+
     if $6 && $7
       self.street_postdirection = group_directions($6, $7)
     else
       self.street_postdirection = $6
     end
-    # puts "number #{self.house_number} predirection #{self.street_predirection} street name #{self.street_name} street type: #{self.street_type} postdirection: #{self.street_postdirection}"
+    self.unit_type = $8
     # self.unit_number = get_unit_number
     # self.unit_type = get_unit_type
     # self.county = get_county

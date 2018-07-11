@@ -49,6 +49,40 @@ RSpec.describe Address, :type => :model do
       it 'can find the street name' do
         expect(address.street_name).to eq('81st')
       end
+      it 'can find the street type' do
+        expect(address.street_type).to eq('St')
+      end
+    end
+
+    context 'given no directionals' do
+      let (:address) { create(:address_simple)}
+      it 'parses out the house number, street name, and type' do
+        expect(address.house_number).to eq('2303')
+        expect(address.street_name).to eq('Shoreshill')
+        expect(address.street_type).to eq('Rd')
+      end
+    end
+
+    context 'given address with unit but no number required' do
+      let (:address) { create(:address_lobby)}
+      it 'finds the correct unit type' do
+        expect(address.unit_type).to eq('Lobby')
+      end
+    end
+
+    context 'Given multiple pre and post directions' do
+      let (:address) { create(:address_directional)}
+      let (:confusing_address) { create(:address_directional_confusion)}
+      it 'can find the correct predirection' do
+        expect(address.street_predirection).to eq('South East')
+      end
+      it 'can find the correct postdirection' do
+        expect(address.street_postdirection).to eq('North')
+      end
+      it 'can ignore opposing directions' do
+        expect(confusing_address.street_postdirection).to eq('North')
+      end
+
     end
 
     describe '#to_s' do
@@ -57,7 +91,5 @@ RSpec.describe Address, :type => :model do
         expect(address.to_s).to eq('129 W 81st St Apt 5A, New York, NY 10024')
       end
     end
-
-    # Do we want to add other addresses that we know are good or bad and say that those should no be valid
   end
 end
